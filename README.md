@@ -1,1 +1,1 @@
-# DSC-106-Project-3
+# The Race to Incoporate Solar Energy
