@@ -1,0 +1,17 @@
+import pandas as pd 
+import altair as alt
+import os
+import numpy as np
+import numpy as np
+import random
+import matplotlib.pyplot as plt 
+
+energy_fp = os.path.join('data', 'owid-energy-data.csv')
+energy = pd.read_csv(energy_fp)
+solar = energy[["country", "year", "solar_cons_change_pct", "solar_cons_change_twh", "solar_consumption", "solar_elec_per_capita", "solar_electricity", "solar_energy_per_capita", "solar_share_elec", "solar_share_energy"]]
+
+count = ["Brazil", "South Korea", "France", "Spain", "Italy", "Australia", "India", "Japan", "Germany", "United States", "China"]
+
+top_solar = solar[solar["country"].isin(count)]
+
+top_solar
