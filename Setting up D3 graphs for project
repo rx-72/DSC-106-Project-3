@@ -1,0 +1,13 @@
+# Setting up D3 context graph steps below:
+
+## 1. Follow steps for lab 4 to set up svelte app in designated directory. Make sure to also install d3 from lab 5
+
+## 2. you'll need to create components as you did in lab 4 and an App.svelte (plus graph.svelte).
+
+## 3. Copy the app.svelte, graph.svelte, and +page.svelte templates on this repository to your create files. (app and graph should be in components, +page should be in under routes)
+
+## 4. Add the csv file to your static folder. This is where "fetch()" will grab the csv data from.
+
+## 5. open the website on your terminal via "npm run dev -- --open".
+
+Let me if you run into any errors - JH
