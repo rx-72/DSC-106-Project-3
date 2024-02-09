@@ -7,7 +7,7 @@
 
     onMount(async () => {
         const res = await fetch(
-            '/coal_gener_nonnull_filtered.csv',
+            '/coal_gener_nonnull_filtered_countries_log.csv',
         );
         const csv = await res.text();
         await d3.csvParse(csv, (d) => {

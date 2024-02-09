@@ -13,7 +13,7 @@
 
     //setting dimensions
     const width = 928;
-    const height = 600;
+    const height = 800;
     const marginTop = 10;
     const marginRight = 30;
     const marginBottom = 20;
@@ -26,7 +26,7 @@
     .range([marginLeft, width - marginRight]);
 
     $: y = d3.scaleLinear()
-    .domain([0, 11000]).nice()
+    .domain([-5, 9])
     .range([height - marginBottom, marginTop])
 
     $: d3.select(gx).call(d3.axisBottom(x).ticks(width / 80));
@@ -66,10 +66,10 @@
     "#fdb082", "#af4d44", "#a759c4", "#a9e03a", "#0d906b", "#9ee3bd", 
     "#5b8846", "#0d8995", "#f25c58", "#70ae4f", "#847f74", "#9094bb", 
     "#ffe2f1", "#a67149", "#936c8e", "#d04907", "#c3b8a6"])
-    $: console.log(color)
 
-    $: line = d3.line();
-
+    $: line = d3.line()
+      .x(d => x(d.year))
+      .y(d => y(d.electricity_generated));
 
 
 </script>
@@ -94,19 +94,19 @@
                 font-weight="bold"
                 text-anchor="start"
             >
-                Electricity generated per year (Terawatt-hours)
+                Electricity generated per year (Terawatt-hours log scaled)
             </text>
         </g>
-        <path
-            fill="none"
-            stroke={color(data.country)}
-            stroke-width=1.5
-            stroke-linejoin="round"
-            stroke-linecap="round"
-            d=line
-        >
-            
-        </path>
+
+        <g stroke-width=1.5 stroke-linejoin="round" stroke-linecap="round" fill="none">
+            {#each [...countries] as [name, data]}
+                <path
+                key={name}
+                stroke="steelblue"
+                d={line(data)}
+                />
+            {/each}
+        </g>
 
         <!-- points -->
         <g stroke="#000" stroke-opacity="0.2">
@@ -115,11 +115,23 @@
                 key={i}
                 cx={x(d.year)}
                 cy={y(d.electricity_generated)}
-                fill={color(d.country)}
-                r="2.5"
+                fill="black"
+                r="1.5"
                 />
             {/each}
         </g>
+
+        <!-- <g display="none">
+        <circle
+            r=2.5
+        />
+
+        <text
+            text-anchor="middle"
+            y=-8
+        />
+    </g> -->
+
 
         </svg>
     </div>
