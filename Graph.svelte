@@ -9,7 +9,7 @@
     let gx;
     let gy;
 
-    $: console.log(data)
+    // $: console.log(data)
 
     //setting dimensions
     const width = 928;
@@ -42,7 +42,11 @@
     );
 
     $: countries = d3.group(data, d => d.country);
-    $: console.log(countries)
+    // $: console.log(countries)
+
+    const points = d3.map(data, (d) => [d.year, d.electricity_generated, d.country]);
+
+    $: console.log(points)
 
     $: color = d3
     .scaleOrdinal()
@@ -71,11 +75,49 @@
       .x(d => x(d.year))
       .y(d => y(d.electricity_generated));
 
+    const bisect = d3.bisector((d) => d.year).center;
+    let tooltipPt = null;
+    function onPointerMove(event) {
+        const i = bisect(data, x.invert(d3.pointer(event)[0]));
+        tooltipPt = data[i];
+    }
+
+    $: d3.select(svg).on('pointerenter', pointerentered);
+    $: d3.select(svg).on('pointermove', pointermoved);
+    $: d3.select(svg).on('pointerleave', pointerleft);
+    $: d3.select(svg).on('touchstart', event => event.preventDefault());
+
+    // $: console.log(tooltipPt)
+
+    function pointermoved(event) {
+        const [xm, ym] = d3.pointer(event);
+        const i = d3.leastIndex(points, ([x, y]) => Math.hypot(x - xm, y - ym));
+        const [x, y, k] = points[i];
+        path.style("stroke", ({z}) => z === k ? null : "#ddd").filter(({z}) => z === k).raise();
+        dot.attr("transform", `translate(${x},${y})`);
+        dot.select("text").text(k);
+        svg.property("value", data[i]).dispatch("input", {bubbles: true});
+    }
+
+    function pointerentered() {
+        path.style("mix-blend-mode", null).style("stroke", "#ddd");
+        dot.attr("display", null);
+    }
+
+    function pointerleft() {
+        path.style("mix-blend-mode", "multiply").style("stroke", null);
+        dot.attr("display", "none");
+        svg.node().value = null;
+        svg.dispatch("input", {bubbles: true});
+    }
+
+    let hovered = -1;
 
 </script>
 
     <div class="coal-coal_electricity generation">
         <svg
+        bind:this={svg}
             {width}
             {height}
             viewBox="0 0 {width} {height}"
@@ -102,8 +144,9 @@
             {#each [...countries] as [name, data]}
                 <path
                 key={name}
-                stroke="steelblue"
+                stroke="lightblue"
                 d={line(data)}
+
                 />
             {/each}
         </g>
@@ -115,23 +158,29 @@
                 key={i}
                 cx={x(d.year)}
                 cy={y(d.electricity_generated)}
-                fill="black"
+                fill="lightblue"
                 r="1.5"
                 />
             {/each}
         </g>
 
-        <!-- <g display="none">
-        <circle
-            r=2.5
-        />
+        <g display="none">
+            <circle
+                r=2.5
+            />
 
-        <text
-            text-anchor="middle"
-            y=-8
-        />
-    </g> -->
+            <text
+                text-anchor="middle"
+                y=-8
+            />
+        </g>
 
+        <!-- tooltip -->
+        {#if tooltipPt}
+            <g transform="translate({x(tooltipPt.year)},{y(tooltipPt.electricity_generated)})">
+                <text font-weight="bold">{tooltipPt.country}</text>
+            </g>
+        {/if}
 
         </svg>
     </div>
